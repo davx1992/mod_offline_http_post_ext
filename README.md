@@ -9,7 +9,7 @@ Installation
 
 1. cd /opt/ejabberd-18.09/.ejabberd-module/sources/
 2. git clone https://github.com/tareqassi/ejabberd-http-post-offline-messages.git;
-3. bash /opt/ejabberd-17.04/.ejabberd-module/bin/ejabberdctl module-install mod_offline_http_post
+3. bash /opt/ejabberd-18.09/.ejabberd-module/bin/ejabberdctl module-install mod_offline_http_post
 4. /etc/init.d/ejabberd restart;
 
 That's it. The module is now installed.
