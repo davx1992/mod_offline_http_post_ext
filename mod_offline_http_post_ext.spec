@@ -1,5 +1,5 @@
 author: "Tareq Ass tareq.n.assi@gmail.com"
 category: "http"
 summary: "HTTP POST user's messages with extensions to target URL when user is offline for eJabberd 18.09"
-home: "https://github.com/tareqassi/mod_offline_http_post.git"
-url: "https://github.com/tareqassi/mod_offline_http_post.git"
+home: "https://github.com/tareqassi/mod_offline_http_post_ext.git"
+url: "https://github.com/tareqassi/mod_offline_http_post_ext.git"

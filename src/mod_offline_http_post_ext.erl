@@ -1,6 +1,6 @@
 %% name of module must match file name
 %% Update: info@ph-f.nl
--module(mod_offline_http_post).
+-module(mod_offline_http_post_ext).
 -author("dev@codepond.org").
 %% modified by @tareqassi
 
@@ -13,13 +13,13 @@
 -include("logger.hrl").
 
 start(_Host, _Opt) ->
-  ?INFO_MSG("mod_offline_http_post loading", []),
+  ?INFO_MSG("mod_offline_http_post_ext loading", []),
   inets:start(),
   ?INFO_MSG("HTTP client started", []),
   ejabberd_hooks:add(offline_message_hook, _Host, ?MODULE, create_message, 1).
 
 stop (_Host) ->
-  ?INFO_MSG("stopping mod_offline_http_post", []),
+  ?INFO_MSG("stopping mod_offline_http_post_ext", []),
   ejabberd_hooks:delete(offline_message_hook, _Host, ?MODULE, create_message, 1).
 
 create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (Packet#message.body /= []) ->
