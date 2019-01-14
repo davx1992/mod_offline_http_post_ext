@@ -44,12 +44,12 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
   case MessageType of
     <<"text">>  ->
       ?INFO_MSG("processing text message ", []),
-      Data = string:join(["to=", http_uri:encode(binary_to_list(ToUser)), 
-                          "&from=", http_uri:encode(binary_to_list(FromUser)), 
-                          "&vhost=", http_uri:encode(binary_to_list(Vhost)), 
-                          "&messageType=", http_uri:encode(binary_to_list(MessageType)), 
-                          "&body=", http_uri:encode(binary_to_list(Body)), 
-                          "&messageId=", http_uri:encode(binary_to_list(MessageId))], ""),
+      Data = string:join(["to=", binary_to_list(ToUser), 
+                          "&from=", binary_to_list(FromUser), 
+                          "&vhost=", binary_to_list(Vhost), 
+                          "&messageType=", binary_to_list(MessageType), 
+                          "&body=", binary_to_list(Body), 
+                          "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
     <<"location">> ->
       ?INFO_MSG("processing location message ", []),
@@ -57,14 +57,14 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
       ?INFO_MSG("longitude is ~p ", [Longitude]),
       Latitude = fxml:get_path_s(xmpp:encode(Packet), [{elem, list_to_binary("location")}, {attr, list_to_binary("lat")}]),
       ?INFO_MSG("longitude is ~p ", [Latitude]),
-      Data = string:join(["to=", http_uri:encode(binary_to_list(ToUser)), 
-                          "&from=", http_uri:encode(binary_to_list(FromUser)), 
-                          "&longitude=", http_uri:encode(binary_to_list(Longitude)), 
-                          "&latitude=", http_uri:encode(binary_to_list(Latitude)), 
-                          "&vhost=", http_uri:encode(binary_to_list(Vhost)), 
-                          "&messageType=", http_uri:encode(binary_to_list(MessageType)), 
-                          "&body=", http_uri:encode(binary_to_list(Body)), 
-                          "&messageId=", http_uri:encode(binary_to_list(MessageId))], ""),
+      Data = string:join(["to=", binary_to_list(ToUser), 
+                          "&from=", binary_to_list(FromUser), 
+                          "&longitude=", binary_to_list(Longitude), 
+                          "&latitude=", binary_to_list(Latitude), 
+                          "&vhost=", binary_to_list(Vhost), 
+                          "&messageType=", binary_to_list(MessageType), 
+                          "&body=", binary_to_list(Body), 
+                          "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
     <<"media">> ->
       ?INFO_MSG("processing mediaa message ", []),
@@ -72,14 +72,14 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
       ?INFO_MSG("mediatype is ~p ", [MediaType]),
       Link = fxml:get_path_s(xmpp:encode(Packet), [{elem, list_to_binary("url")}, {attr, list_to_binary("link")}]),
       ?INFO_MSG("link is ~p ", [Link]),
-      Data = string:join(["to=", http_uri:encode(binary_to_list(ToUser)), 
-                          "&from=", http_uri:encode(binary_to_list(FromUser)), 
-                          "&url=", http_uri:encode(binary_to_list(Link)), 
-                          "&mediaType=", http_uri:encode(binary_to_list(MediaType)), 
-                          "&vhost=", http_uri:encode(binary_to_list(Vhost)), 
-                          "&messageType=", http_uri:encode(binary_to_list(MessageType)), 
-                          "&body=", http_uri:encode(binary_to_list(Body)), 
-                          "&messageId=", http_uri:encode(binary_to_list(MessageId))], ""),
+      Data = string:join(["to=", binary_to_list(ToUser), 
+                          "&from=", binary_to_list(FromUser), 
+                          "&url=", binary_to_list(Link), 
+                          "&mediaType=", binary_to_list(MediaType), 
+                          "&vhost=", binary_to_list(Vhost), 
+                          "&messageType=", binary_to_list(MessageType), 
+                          "&body=", binary_to_list(Body), 
+                          "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
     <<"">> ->
       ?INFO_MSG("missing mtype or its value", [])
@@ -91,6 +91,6 @@ create_message(Acc) ->
 
 post_offline_message(PostUrl, Token, Data) ->
   ?INFO_MSG("post ~p to ~p using ~p~n ", [Data, PostUrl, Token]),
-  Request = {binary_to_list(PostUrl), [{"Authorization", binary_to_list(Token)}], "application/x-www-form-urlencoded", Data},
+  Request = {binary_to_list(PostUrl), [{"Authorization", binary_to_list(Token)}], "application/x-www-form-urlencoded;  charset=utf-8", Data},
   httpc:request(post, Request,[],[]),
   ?INFO_MSG("post request sent", []).
