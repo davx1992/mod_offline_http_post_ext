@@ -46,6 +46,7 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
   MessageId = Packet#message.id,
   ?INFO_MSG("MessageId is ~p~n ", [MessageId]),
   MessageType = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("mtype")}, {attr, list_to_binary("value")}]),
+  Channel = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("channel")}, {attr, list_to_binary("value")}]),
 
   case MessageType of
     <<"text">>  ->
@@ -53,7 +54,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
       Data = string:join(["to=", binary_to_list(ToUser), 
                           "&from=", binary_to_list(FromUser), 
                           "&vhost=", binary_to_list(Vhost), 
-                          "&messageType=", binary_to_list(MessageType), 
+                          "&messageType=", binary_to_list(MessageType),
+                          "&channel=", binary_to_list(Channel),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
@@ -68,10 +70,24 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&longitude=", binary_to_list(Longitude), 
                           "&latitude=", binary_to_list(Latitude), 
                           "&vhost=", binary_to_list(Vhost), 
-                          "&messageType=", binary_to_list(MessageType), 
+                          "&messageType=", binary_to_list(MessageType),
+                          "&channel=", binary_to_list(Channel),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
+    <<"buyrequest">> ->
+      ?INFO_MSG("processing location message ", []),
+      BuyRequestId = fxml:get_path_s(xmpp:encode(Packet), [{elem, list_to_binary("buyrequest")}, {attr, list_to_binary("id")}]),
+      ?INFO_MSG("BuyRequestId is ~p ", [BuyRequestId]),
+      Data = string:join(["to=", binary_to_list(ToUser), 
+                          "&from=", binary_to_list(FromUser), 
+                          "&buyRequestId=", binary_to_list(BuyRequestId),  
+                          "&vhost=", binary_to_list(Vhost), 
+                          "&messageType=", binary_to_list(MessageType), 
+                          "&channel=", binary_to_list(Channel),
+                          "&body=", binary_to_list(Body), 
+                          "&messageId=", binary_to_list(MessageId)], ""),
+      post_offline_message(PostUrl, Token, Data); 
     <<"media">> ->
       ?INFO_MSG("processing mediaa message ", []),
       MediaType = fxml:get_path_s(xmpp:encode(Packet), [{elem, list_to_binary("url")}, {attr, list_to_binary("mediaType")}]),
@@ -83,7 +99,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&url=", binary_to_list(Link), 
                           "&mediaType=", binary_to_list(MediaType), 
                           "&vhost=", binary_to_list(Vhost), 
-                          "&messageType=", binary_to_list(MessageType), 
+                          "&messageType=", binary_to_list(MessageType),
+                          "&channel=", binary_to_list(Channel),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
