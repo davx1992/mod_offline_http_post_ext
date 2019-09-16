@@ -46,7 +46,13 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
   MessageId = Packet#message.id,
   ?INFO_MSG("MessageId is ~p~n ", [MessageId]),
   MessageType = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("mtype")}, {attr, list_to_binary("value")}]),
+  ?INFO_MSG("MessageType is ~p~n ", [MessageType]),
   Channel = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("channel")}, {attr, list_to_binary("value")}]),
+  ?INFO_MSG("Channel is ~p~n ", [Channel]),
+  SenderId = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("channel")}, {attr, list_to_binary("senderId")}]),
+  ?INFO_MSG("SenderId is ~p~n ", [SenderId]),
+  RecipientId = fxml:get_path_s(xmpp:encode(Packet), [{elem,list_to_binary("channel")}, {attr, list_to_binary("recipientId")}]),
+  ?INFO_MSG("RecipientId is ~p~n ", [RecipientId]),
 
   case MessageType of
     <<"text">>  ->
@@ -56,6 +62,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&vhost=", binary_to_list(Vhost), 
                           "&messageType=", binary_to_list(MessageType),
                           "&channel=", binary_to_list(Channel),
+                          "&senderId=", binary_to_list(SenderId),
+                          "&recipientId=", binary_to_list(RecipientId),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
@@ -72,6 +80,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&vhost=", binary_to_list(Vhost), 
                           "&messageType=", binary_to_list(MessageType),
                           "&channel=", binary_to_list(Channel),
+                          "&senderId=", binary_to_list(SenderId),
+                          "&recipientId=", binary_to_list(RecipientId),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
@@ -85,6 +95,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&vhost=", binary_to_list(Vhost), 
                           "&messageType=", binary_to_list(MessageType), 
                           "&channel=", binary_to_list(Channel),
+                          "&senderId=", binary_to_list(SenderId),
+                          "&recipientId=", binary_to_list(RecipientId),
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data); 
@@ -101,6 +113,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
                           "&vhost=", binary_to_list(Vhost), 
                           "&messageType=", binary_to_list(MessageType),
                           "&channel=", binary_to_list(Channel),
+                          "&senderId=", binary_to_list(SenderId),
+                          "&recipientId=", binary_to_list(RecipientId), 
                           "&body=", binary_to_list(Body), 
                           "&messageId=", binary_to_list(MessageId)], ""),
       post_offline_message(PostUrl, Token, Data);
