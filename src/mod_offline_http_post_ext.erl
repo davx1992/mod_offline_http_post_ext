@@ -6,7 +6,7 @@
 
 -behaviour(gen_mod).
 
--export([start/2, stop/1, create_message/1]).
+-export([start/2, stop/1, mod_options/1, depends/2, mod_opt_type/1, create_message/1]).
 
 -include("scram.hrl").
 -include("xmpp.hrl").
@@ -22,6 +22,15 @@ stop (_Host) ->
   ?INFO_MSG("stopping mod_offline_http_post_ext", []),
   ejabberd_hooks:delete(offline_message_hook, _Host, ?MODULE, create_message, 1).
 
+mod_opt_type(auth_token) -> fun iolist_to_binary/1;
+mod_opt_type(post_url) -> fun iolist_to_binary/1;
+
+mod_options(_Host) ->
+    [{auth_token, "tobechanged"},
+     {post_url, "/tbchanged/"}].
+
+depends(_Host, _Opts) ->
+    [].
 
 create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (Packet#message.body /= []) ->
   [{text, _, Body}] = Packet#message.body,
