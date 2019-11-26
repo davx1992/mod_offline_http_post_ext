@@ -6,7 +6,8 @@
 
 -behaviour(gen_mod).
 
--export([start/2, stop/1, mod_options/1, depends/2, mod_opt_type/1, create_message/1]).
+-export([start/2, stop/1, depends/2, mod_opt_type/1, mod_options/1]).
+-export([handle_offline_message/1]).
 
 -include("scram.hrl").
 -include("xmpp.hrl").
@@ -16,14 +17,14 @@ start(_Host, _Opt) ->
   ?INFO_MSG("mod_offline_http_post_ext loading", []),
   inets:start(),
   ?INFO_MSG("HTTP client started", []),
-  ejabberd_hooks:add(offline_message_hook, _Host, ?MODULE, create_message, 1).
+  ejabberd_hooks:add(offline_message_hook, _Host, ?MODULE, handle_offline_message, 1).
 
 stop (_Host) ->
   ?INFO_MSG("stopping mod_offline_http_post_ext", []),
-  ejabberd_hooks:delete(offline_message_hook, _Host, ?MODULE, create_message, 1).
+  ejabberd_hooks:delete(offline_message_hook, _Host, ?MODULE, handle_offline_message, 1).
 
 mod_opt_type(auth_token) -> fun iolist_to_binary/1;
-mod_opt_type(post_url) -> fun iolist_to_binary/1;
+mod_opt_type(post_url) -> fun iolist_to_binary/1.
 
 mod_options(_Host) ->
     [{auth_token, "tobechanged"},
@@ -32,14 +33,14 @@ mod_options(_Host) ->
 depends(_Host, _Opts) ->
     [].
 
-create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (Packet#message.body /= []) ->
+handle_offline_message({Action, Packet}=Acc) when (Packet#message.type == chat) and (Packet#message.body /= []) ->
   [{text, _, Body}] = Packet#message.body,
   ?INFO_MSG("Message Body is ~p~n ", [Body]),
   From = Packet#message.from,
   To = Packet#message.to,
-  Token = gen_mod:get_module_opt(To#jid.lserver, ?MODULE, auth_token, fun(S) -> iolist_to_binary(S) end, list_to_binary("")),
+  Token = gen_mod:get_module_opt(To#jid.lserver, ?MODULE, auth_token),
   ?INFO_MSG("Token is ~p~n ", [Token]),
-  PostUrl = gen_mod:get_module_opt(To#jid.lserver, ?MODULE, post_url, fun(S) -> iolist_to_binary(S) end, list_to_binary("")),
+  PostUrl = gen_mod:get_module_opt(To#jid.lserver, ?MODULE, post_url),
   ?INFO_MSG("PostUrl is ~p~n ", [PostUrl]),
   ToUser = To#jid.luser,
   ?INFO_MSG("to is ~p~n ", [ToUser]),
@@ -121,7 +122,8 @@ create_message({Action, Packet} = Acc) when (Packet#message.type == chat) and (P
   end,
   Acc;
 
-create_message(Acc) ->
+
+handle_offline_message(Acc) ->
   Acc.
 
 post_offline_message(PostUrl, Token, Data) ->
@@ -129,3 +131,4 @@ post_offline_message(PostUrl, Token, Data) ->
   Request = {binary_to_list(PostUrl), [{"Authorization", binary_to_list(Token)}], "application/x-www-form-urlencoded;  charset=utf-8", Data},
   httpc:request(post, Request,[],[]),
   ?INFO_MSG("post request sent", []).
+
